@@ -1,6 +1,8 @@
 import threading
 import streamlit as st
 
+import chatbot
+
 
 @st.cache_resource
 def get_room():
@@ -23,6 +25,8 @@ if "name" not in st.session_state:
 
 st.caption(f"Chatting as {st.session_state.name}")
 
+chat_tab, chatbot_tab = st.tabs(["Chat", "Chatbot"])
+
 
 @st.fragment(run_every=1)
 def show_messages():
@@ -32,10 +36,14 @@ def show_messages():
             st.markdown(m["text"])
 
 
-show_messages()
+with chat_tab:
+    show_messages()
 
-text = st.chat_input("Message")
-if text:
-    with room["lock"]:
-        room["messages"].append({"name": st.session_state.name, "text": text})
-    st.rerun()
+    text = st.chat_input("Message")
+    if text:
+        with room["lock"]:
+            room["messages"].append({"name": st.session_state.name, "text": text})
+        st.rerun()
+
+with chatbot_tab:
+    chatbot.render()
